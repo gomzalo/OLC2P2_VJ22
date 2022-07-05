@@ -45,15 +45,25 @@ def get_algoritmo(clf_name, headers, data):
     if clf_name == "Regresión lineal":
         x_selected = st.selectbox("Elige la columna para el eje X", headers)
         y_selected = st.selectbox("Elige la columna para el eje y", headers)
-        pred = st.text_input("Ingresa el valor a predecir")
-        linear_regresion(x_selected, y_selected, int(pred), data)
+        prediccion = st.text_input("Ingresa el valor a predecir")
+        if(prediccion != None or prediccion != ""):
+            try:
+                pred = float(prediccion)
+                linear_regresion(x_selected, y_selected, data, pred)
+            except:
+                st.write("Ingresa un valor numerico a predecir")
+                linear_regresion(x_selected, y_selected, data)
     elif clf_name == "Regresión polinomial":
         x_selected = st.selectbox("Elige la columna para el eje X", headers)
         y_selected = st.selectbox("Elige la columna para el eje y", headers)
-        pred = st.text_input("Ingresa el valor a predecir")
-        # array from 0 to 25
         grado = st.slider("grado", 1, 20)
-        polinomial_reg(x_selected, y_selected, grado, int(pred), data)
+        prediccion = st.text_input("Ingresa el valor a predecir")
+        if(prediccion != None or prediccion != ""):
+            try:
+                pred = float(prediccion)
+                polinomial_reg(x_selected, y_selected, grado, data, pred)
+            except:
+                polinomial_reg(x_selected, y_selected, grado, data)
     else:
         st.write("xd?")
 
@@ -62,7 +72,7 @@ def get_algoritmo(clf_name, headers, data):
 
 # |||||||||||||     Regresión lineal    |||||||||||||
 
-def linear_regresion(x_col, y_col, pred, data):
+def linear_regresion(x_col, y_col, data, pred=None):
     X = np.asarray(data[x_col]).reshape(-1, 1)
     Y = data[y_col]
     # Linear
@@ -79,18 +89,23 @@ def linear_regresion(x_col, y_col, pred, data):
     st.write("Coeficiente: ", linear_regression.coef_)
     st.write("R2: ", r2_score(Y, Y_pred))
 
-    Y_new = linear_regression.predict([[pred]])
-    st.write("Prediccion: ", Y_new)
-
     plt.scatter(X, Y)
     plt.colorbar()
     plt.plot(X, Y_pred, color='red')
     st.pyplot()
 
+    if pred != None or pred != "":
+        try:
+            Y_new = linear_regression.predict([[pred]])
+            st.write("Prediccion: ")
+            st.write(f""" # {Y_new}""")
+        except:
+            st.write("Ingresa un valor numerico a predecir")
+
 
 # |||||||||||||     Regresión polinomial    |||||||||||||
 
-def polinomial_reg(x_col, y_col, grado, pred, data):
+def polinomial_reg(x_col, y_col, grado, data, pred=None):
     X = np.asarray(data[x_col]).reshape(-1, 1)
     Y = data[y_col]
     # Polynomial
@@ -111,12 +126,18 @@ def polinomial_reg(x_col, y_col, grado, pred, data):
     st.write("Funcion: ")
     st.code(f""" Y =  {funcion} """, language="mathjax")
     st.write("Coeficientes: ", linear_regression.coef_)
-    Y_new = linear_regression.predict(poly.fit_transform([[int(pred)]]))
-    st.write("Predicción:", Y_new)
 
     plt.scatter(X, Y)
     plt.plot(X, Y_pred, color='purple')
     st.pyplot()
+
+    if pred != None or pred != "":
+        try:
+            Y_new = linear_regression.predict([[pred]])
+            st.write("Prediccion: ")
+            st.write(f""" # {Y_new}""")
+        except:
+            st.write("Ingresa un valor numerico a predecir")
 
 # |||||||||||||     Regresión gausiana    |||||||||||||
 
