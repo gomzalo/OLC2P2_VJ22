@@ -133,7 +133,7 @@ def polinomial_reg(x_col, y_col, grado, data, pred=None):
 
     if pred != None or pred != "":
         try:
-            Y_new = linear_regression.predict([[pred]])
+            Y_new = linear_regression.predict(poly.fit_transform([[pred]]))
             st.write("Prediccion: ")
             st.write(f""" # {Y_new}""")
         except:
