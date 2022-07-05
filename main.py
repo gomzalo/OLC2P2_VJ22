@@ -72,7 +72,11 @@ def linear_regresion(x_col, y_col, pred, data):
 
     # st.write(Y_pred)
     st.write("Error medio: ", mean_squared_error(Y, Y_pred, squared=True))
-    st.write("Coef: ", linear_regression.coef_)
+    func = str(linear_regression.coef_[0]) + "X" + " + "
+    funcion = func + str(linear_regression.intercept_)
+    st.write("Funcion: ")
+    st.code(f""" Y =  {funcion} """, language="mathjax")
+    st.write("Coeficiente: ", linear_regression.coef_)
     st.write("R2: ", r2_score(Y, Y_pred))
 
     Y_new = linear_regression.predict([[pred]])
@@ -100,7 +104,13 @@ def polinomial_reg(x_col, y_col, grado, pred, data):
     # st.write(Y_pred)
     st.write("Error medio: ", np.sqrt(mean_squared_error(Y, Y_pred, squared=False)))
     st.write("R2: ", r2_score(Y, Y_pred))
-
+    func = ""
+    for i in range(len(linear_regression.coef_)):
+        func += str(linear_regression.coef_[i]) + "x^" + str(i) + " + "
+    funcion = func + str(linear_regression.intercept_)
+    st.write("Funcion: ")
+    st.code(f""" Y =  {funcion} """, language="mathjax")
+    st.write("Coeficientes: ", linear_regression.coef_)
     Y_new = linear_regression.predict(poly.fit_transform([[int(pred)]]))
     st.write("Predicción:", Y_new)
 
@@ -108,6 +118,31 @@ def polinomial_reg(x_col, y_col, grado, pred, data):
     plt.plot(X, Y_pred, color='purple')
     st.pyplot()
 
+# |||||||||||||     Regresión gausiana    |||||||||||||
+
+def gaus_reg(x_col, y_col, grado, pred, data):
+    X = np.asarray(data[x_col]).reshape(-1, 1)
+    Y = data[y_col]
+    # Polynomial
+    poly = PolynomialFeatures(degree=grado)
+    X_trans = poly.fit_transform(X)
+    # Linear
+    linear_regression = LinearRegression()
+    linear_regression.fit(X_trans, Y)
+    Y_pred = linear_regression.predict(X_trans)
+
+    # st.write(Y_pred)
+    st.write("Error medio: ", np.sqrt(mean_squared_error(Y, Y_pred, squared=False)))
+    st.write("R2: ", r2_score(Y, Y_pred))
+    st.write("Coeficientes: ", linear_regression.coef_)
+    funcion = "Y = " + str(linear_regression.coef_[0]) + "*X + "+str(linear_regression.intercept_)
+    st.write("Intercepción: ", funcion)
+    Y_new = linear_regression.predict(poly.fit_transform([[int(pred)]]))
+    st.write("Predicción:", Y_new)
+
+    plt.scatter(X, Y)
+    plt.plot(X, Y_pred, color='purple')
+    st.pyplot()
 
 #   ::::::::::::::::::::::   File upload    ::::::::::::::::::::::
 
@@ -132,11 +167,11 @@ if uploaded_file is not None:
         data_frame = None
 
     if data_frame is not None:
-        # data_frame = data_frame.replace('', np.nan, regex=True)
-        # data_frame = data_frame.fillna(0)
+        data_frame = data_frame.replace('', np.nan, regex=True)
+        data_frame = data_frame.fillna(0)
         headers = data_frame.columns
         # --------      Eligiendo el algoritmo      --------
-        classifier_name = st.sidebar.selectbox("Elige el algoritmo", ("Regresión lineal", "Regresión polinomial"))
+        classifier_name = st.sidebar.selectbox("Elige el algoritmo", ("Regresión lineal", "Regresión polinomial", "Regresión gausiana"))
 
         st.write(""" ## Parametrización """)
         get_algoritmo(classifier_name, headers, data_frame)
